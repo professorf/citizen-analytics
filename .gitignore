@@ -37,3 +37,10 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#
+# Professor F. added
+#
+
+# Anything in the data folder
+# data/ # Maybe not yet
