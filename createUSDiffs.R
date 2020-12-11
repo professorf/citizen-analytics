@@ -10,5 +10,6 @@ createUSDiffs=function(df) {
   Deltas=t(Deltas) # Always have to transpose due to sapply returning a column vector
   colnames(Deltas)=colnames(df)[3:NumCols]
   States  = unique(df$State)
-  dfd=data.frame(state=States,Deltas)   # dfd: data frame of daily differences
+  dfd=data.frame(State=States,Deltas)   # dfd: data frame of daily differences
+  dfd
 }

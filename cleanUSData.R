@@ -39,5 +39,5 @@ cleanUSData=function(dfOrig) {
   # Create a dataframe (df) of the collapsed state values. This data frame contains daily running totals.
   #
   df=data.frame(State=States,StateTotals)
-  
+  df
 }

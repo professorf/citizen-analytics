@@ -3,76 +3,40 @@
 #
 if (require("RColorBrewer")==F) {  install.packages("RColorBrewer");  library(RColorBrewer) }
 #
-# Choose a dataset filename to analyze
+# Source required functions
+#
+source("cleanUSData.R")
+source("createUSDiffs.R")
+source("plotState.R")
+#
+# Choose a dataset to analyze & get filename
 #
 Folder   = "data"
 Files    = dir(Folder, "*.csv")
 DataType = "deaths"                             # Options: confirmed | deaths
-Region   = "US"                                 # Options: global | US
+Region   = "US"                                 # USA (in world scripts, this is "global")
 FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
 FileName=Files[FilePatt]                        # Full filename
 
 #
 # Read fileName into data frame & read other important data sets
 #
+
 dfOrig=read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
 dfPopu=read.csv(sprintf("%s/jhu-statepop.csv"     , Folder          )) # Population data
 dfArea=read.csv(sprintf("%s/census-state-area.csv", Folder          )) # Land area data
 
-#
-# Rename some columns to more meaningful lables 
-#
-CountyRows                   = which(colnames(dfOrig)=="Admin2")
-StateRows                    = which(colnames(dfOrig)=="Province_State")
-colnames(dfOrig)[CountyRows] = "County"
-colnames(dfOrig)[StateRows]  = "State"
+df  = cleanUSData  (dfOrig)
+dfd = createUSDiffs(df)
 
-#
-# Get a list of unique states
-#
-States=unique(dfOrig$State)
+States=dfd$State
 
-# 
-# For each State's rows, sum all columns
-#
-StateTotals=sapply(States, function (x) {
-  # Extract the county rows for a given state x
-  rows=which(dfOrig$State==x) # & (grepl("^Out of", dfOrig$County)==F) & (grepl("^Unassigned", dfOrig$County)==F))
-  # Extract just the date cols for a county
-  cols=grep("^X", colnames(dfOrig)) # All date columns begin with x
-  # Results in a rectangular matrix, where rows are counties, and cols are dates
-  rect=dfOrig[rows,cols]
-  # Sum all columns to get the totals for a given state
-  totals=colSums(rect)
-})
-
-
-# Transpose and add row & column names
-StateTotals=t(StateTotals)
-cols=grep("^X", colnames(dfOrig))
-colnames(StateTotals)=names(dfOrig)[cols]
-rownames(StateTotals)=States
-
-#
-# Create a dataframe (df) of the collapsed state values. This data frame contains daily running totals.
-#
-df=data.frame(State=States,StateTotals)
-
-#
-# Create a data frame of daily differences (dfd) based on df's daily running totals 
-#
-NumCols=length(colnames(df)) # This is 1 + #dates
-NumRows=length(df$State)     # This is the number of states                
-Deltas=sapply(1:NumRows, function (row) {                               # for each state
-  Delta=sapply(3:NumCols, function (col) {df[row,col]-df[row,(col-1)]}) # Create vector of daily differences
-}) # Note: start at column 3 because column 2 is the first date, no delta for 1st date
-Deltas=t(Deltas) # Always have to transpose due to sapply returning a column vector
-colnames(Deltas)=colnames(df)[3:NumCols]
-# dfd: data frame of deltas.
-dfd=data.frame(state=States,Deltas)
-
-#x=unlist(dfd[1,2:(NumCols-2)])
+#NumCols=length(colnames(dfd))
+#TestState="New Mexico"
+#row=which(dfd$state==TestState) # Test
+#x=unlist(dfd[row,2:(NumCols-1)])
 #barplot(x)
+#title(TestState)
 
 #
 # Create a list of just the 50 states, excluding territories and cruise ships!
@@ -118,7 +82,7 @@ for (State in States50) {
   #
   ymax =max(tv)+max(tv)/10
   options(scipen=9)
-  barplot(tv, ylim=c(0, ymax)) # 2020-08-11 Don't do cumulative plot
+  #barplot(tv, ylim=c(0, ymax)) # 2020-08-11 Don't do cumulative plot
   #
   # Title graph
   #
@@ -128,7 +92,7 @@ for (State in States50) {
   dval=lastval-yestval
   slastval=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(lastval), perl=T)
   sdval=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(dval), perl=T)
-  title(sprintf("%s - COVID-19 CUMULATIVE %s: %s as of %s (%s%s)", State, toupper(DataType), slastval, lastnam, ifelse((dval>0),"+", "-"), sdval)) # 2020-08-11: Don't do cumulative
+  #title(sprintf("%s - COVID-19 CUMULATIVE %s: %s as of %s (%s%s)", State, toupper(DataType), slastval, lastnam, ifelse((dval>0),"+", "-"), sdval)) # 2020-08-11: Don't do cumulative
   #
   # Create a vector of daily changes
   #
