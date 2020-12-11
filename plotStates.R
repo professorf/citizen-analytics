@@ -49,117 +49,46 @@ States50=States[FiftyStateRows]
 #
 # Set up accumulators for population density and total per million and totals
 #
-cpd=c()   # Cumulative population density
-cpm=c()   # Cumulative per million
-ctt=c()   # Cumulative total deaths (or confirmed)
-clt=c()   # Cumulative last daily death (or confirmed)
-cltpm=c() # Cumulative last daily death (or confirmed) per million
-ca=c()    # Cumulative area
-cp=c()    # Cumulative population
+cPopuDens=c()   # Cumulative population density
+cOverallPerMillion=c()   # Cumulative per million
+cTotal=c()   # Cumulative total deaths (or confirmed)
+cLastVal=c()   # Cumulative last daily death (or confirmed)
+cLastValPerMillion=c() # Cumulative last daily death (or confirmed) per million
+cStateArea=c()    # Cumulative area
+cStatePopulation=c()    # Cumulative population
 #
 # Now plot a specific State
 #
 for (State in States50) {
-  row=which (df$State==State)
-  #
-  # Determine date columns
-  #
-  cols=grep("^X", colnames(df)) # dates have "X" as a column-label prefix)
-  #
-  # Extract the time series data and clean-up labels 
-  #
-  ts=df[row,cols]                       # a row (1xN matrix)
-  tv=unlist(ts)                         # convert to vector
-  names(tv)=gsub("X","", names(tv))     # remove "X" in column names
-  names(tv)=gsub("[.]", "/", names(tv)) # change "." to "/"
-  #
-  # Plot
-  #
-  ymax =max(tv)+max(tv)/10
-  options(scipen=9)
-  #barplot(tv, ylim=c(0, ymax)) # 2020-08-11 Don't do cumulative plot
-  #
-  # Title graph
-  #
-  lastval=tv[length(tv)]
-  lastnam=names(tv)[length(tv)]
-  yestval=tv[length(tv)-1]
-  dval=lastval-yestval
-  slastval=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(lastval), perl=T)
-  sdval=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(dval), perl=T)
-  #title(sprintf("%s - COVID-19 CUMULATIVE %s: %s as of %s (%s%s)", State, toupper(DataType), slastval, lastnam, ifelse((dval>0),"+", "-"), sdval)) # 2020-08-11: Don't do cumulative
-  #
-  # Create a vector of daily changes
-  #
-  dc=sapply(1:(length(tv)-1), function(x) {(tv[x+1]-tv[x])})
-  #
-  # Plot daily changes
-  #
-  ymaxc=max(dc)+max(dc)/5
-  #barplot(dc,ylim=c(0, ymaxc))
-  pal=brewer.pal(8, "Dark2")
-  bp=barplot(dc,ylim=c(0, ymaxc), col="#CCCCCC", bor="white", xlab="date", ylab=sprintf("# %s",DataType))
-  #
-  # 7-day moving average
-  #
-  avg=sapply(7:length(dc), function(i) { mean(dc[(i-6):i])})
-  lines(bp[7:length(dc)], avg, col=pal[1])
-  #avg=sapply(4:(length(dc)-3), function(i) { mean(dc[(i-3):(i+3)])})
-  #lines(bp[4:(length(dc)-3)], avg, col=pal[1])
-  #
-  # Title graph
-  #
-  lastvalc=dc[length(dc)]
-  lastnamc=names(dc)[length(dc)]
-  imaxday=which(dc==max(dc))[1]
-  maxdayval=dc[imaxday]
-  maxdaynam=names(dc)[imaxday]
-  slastvalc=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(lastvalc), perl=T)
-  smaxdayval=gsub("(?!^)(?=(?:\\d{3})+$)", ",", as.character(maxdayval), perl=T)
-  popu=dfPopu$Population[which(dfPopu$State==State)]
-  pops=formatC(popu, format="f", big.mark = ",", digits=0)
-  iastate=which(dfArea$State==State)
-  if (identical(iastate, integer(0))==T) {
-    areas="unk" 
-    area=1
-  } else {
-    area = dfArea$landsqm[iastate]
-    areas=formatC(area, format="f", big.mark=",", digits=0)
-  }
-  pd=popu/area
-  pas=formatC(pd, format="f", big.mark=",", digits=2)
-  tt=sum(dc)
-  tts=formatC(tt, format="f", big.mark=",", digits=0)
-  pm=tt/popu*1000000
-  pms=formatC(pm, format="f", big.mark=",", digits=2)
-  title(sprintf("%s - COVID-19 DAILY %s (Total): %s on %s (%s)\nPop: %s; Area: %s sq-miles; Peak: %s on %s\nPopulation Density: %s; Total per Million: %s", State, toupper(DataType), slastvalc, lastnamc, tts, pops, areas, smaxdayval, maxdaynam, pas, pms))
+  RetVal = plotState(dfd, State, DataType)
   dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
   dev.off()
   #
   # Update Accmulators
   #
-  cpd=c(cpd, pd)       # Accumulated population densities
-  ctt=c(ctt, tt)       # Accumulated total (deaths or cases)
-  clt=c(clt, lastvalc) # Accumulated last daily totals
-  cltpm=c(cltpm, lastvalc/popu*1000000)
-  cpm=c(cpm, pm)       # Accumulated per million (deaths or case)
-  ca =c(ca, area)      # Accumulated areas
-  cp =c(cp, popu)      # Accumulated population
+  # (Change to lists)
+  cPopuDens=c(cPopuDens, RetVal$PopulationDensity)       # Accumulated population densities
+  cTotal=c(cTotal, RetVal$Total)       # Accumulated total (deaths or cases)
+  cLastVal=c(cLastVal, RetVal$LastVal) # Accumulated last daily totals
+  cLastValPerMillion=c(cLastValPerMillion, RetVal$LastValPerMillion)
+  cOverallPerMillion=c(cOverallPerMillion, RetVal$OverallPerMillion)       # Accumulated per million (deaths or case)
+  cStateArea =c(cStateArea, RetVal$StateArea)      # Accumulated areas
+  cStatePopulation =c(cStatePopulation, RetVal$StatePopulation)      # Accumulated population
 }
 #
 # Linear Model 
 #
-Population.Density=cpd
-Deaths.Per.Million=cpm
-Total.Area=ca
-Total.DC=ctt
+Population.Density=cPopuDens
+Deaths.Per.Million=cOverallPerMillion
+Total.Area=cStateArea
+Total.DC=cTotal
 
 plot(Population.Density, Deaths.Per.Million, ylim=c(0,max(Deaths.Per.Million)+250)) 
 title("Covid-19, U.S. States: Population Density vs Deaths Per Million")
 model=lm(Deaths.Per.Million~Population.Density)
 summary(model)
 lines(Population.Density, predict(model))
-text(cpd, cpm, st2, pos=3, cex=0.50)
+text(cPopuDens, cOverallPerMillion, st2, pos=3, cex=0.50)
 dev.copy(png, sprintf("statepics/z-%s-linear-model.png",DataType), width=1280, height=720)
 dev.off()
 hist(residuals(model))
@@ -201,28 +130,28 @@ st2=c  ("AL","AK","AZ","AR","CA",
 parcol=sapply(party, function(x) {if (x=="R") "pink" else "lightblue"})
 
 # daily deaths
-xoff=barplot(clt, names=st2, ylim=c(0,max(clt)+100), col=parcol, cex.names=0.75)
-text(xoff,clt,clt,cex=0.75,pos=3)
-title(sprintf("U.S.: State daily %s on %s\nTotal on %s: %d", DataType, lastnamc, lastnamc, sum(clt)))
+xoff=barplot(cLastVal, names=st2, ylim=c(0,max(cLastVal)+100), col=parcol, cex.names=0.75)
+text(xoff,cLastVal,cLastVal,cex=0.75,pos=3)
+title(sprintf("U.S.: State daily %s on %s\nTotal on %s: %d", DataType, RetVal$LastDate, RetVal$LastDate, sum(cLastVal)))
 
 # daily deaths per million
-xoff=barplot(cltpm, names=st2, ylim=c(0,max(cltpm)+10), col=parcol, cex.names=0.75)
-text(xoff,cltpm,round(cltpm, 1),cex=0.75,pos=3)
-title(sprintf("U.S.: State daily %s on %s (per million)", DataType, lastnamc))
+xoff=barplot(cLastValPerMillion, names=st2, ylim=c(0,max(cLastValPerMillion)+10), col=parcol, cex.names=0.75)
+text(xoff,cLastValPerMillion,round(cLastValPerMillion, 1),cex=0.75,pos=3)
+title(sprintf("U.S.: State daily %s on %s (per million)", DataType, RetVal$LastDate))
 
-xoff=barplot(ctt, names=st2, ylim=c(0,max(ctt)+5000), col=parcol, cex.names=0.75, border=parcol)
-text(xoff,ctt,ctt,cex=0.75,pos=3)
-title(sprintf("U.S.: Overall %s as of %s\nTotal on %s: %d", DataType, lastnamc, lastnamc, sum(ctt)))
+xoff=barplot(cTotal, names=st2, ylim=c(0,max(cTotal)+5000), col=parcol, cex.names=0.75, border=parcol)
+text(xoff,cTotal,cTotal,cex=0.75,pos=3)
+title(sprintf("U.S.: Overall %s as of %s\nTotal on %s: %d", DataType, RetVal$LastDate, RetVal$LastDate, sum(cTotal)))
 
 # deaths per million
-xoff=barplot(cpm, names=st2, ylim=c(0,max(cpm)+500), col=parcol, cex.names=0.75, border=parcol)
-text(xoff,cpm,round(cpm),cex=0.75,pos=3)
-title(sprintf("U.S.: Overall %s (per million) as of %s\nTotal on %s: %d", DataType, lastnamc, lastnamc, sum(ctt)))
+xoff=barplot(cOverallPerMillion, names=st2, ylim=c(0,max(cOverallPerMillion)+500), col=parcol, cex.names=0.75, border=parcol)
+text(xoff,cOverallPerMillion,round(cOverallPerMillion),cex=0.75,pos=3)
+title(sprintf("U.S.: Overall %s (per million) as of %s\nTotal on %s: %d", DataType, RetVal$LastDate, RetVal$LastDate, sum(cTotal)))
 
 # Calculate percentages R vs D
 Rrows=which(party=="R")
 Drows=which(party=="D")
-Rdths=sum(clt[Rrows])
-Ddths=sum(clt[Drows])
-Tdths=sum(clt)
+Rdths=sum(cLastVal[Rrows])
+Ddths=sum(cLastVal[Drows])
+Tdths=sum(cLastVal)
 print(sprintf("R deaths: %d (%.2f)%%; D deaths: %d (%.2f)%%", Rdths, Rdths/Tdths*100, Ddths, Ddths/Tdths*100))

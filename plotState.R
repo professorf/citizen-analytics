@@ -35,38 +35,25 @@ plotState = function (dfd, State, DataType) {
   MaxDate=names(StateVals)[iMaxDay]
   LastValFmt=formatC(LastVal, format="f", digits=0, big.mark=",")
   MaxDayValFmt=formatC(MaxDayVal, format="f", digits=0, big.mark=",")
-  Population=USPopulation$Population[which(USPopulation$State==State)]
-  PopulationFmt=formatC(Population, format="f", big.mark = ",", digits=0)
+  StatePopulation=USPopulation$Population[which(USPopulation$State==State)]
+  StatePopulationFmt=formatC(StatePopulation, format="f", big.mark = ",", digits=0)
   StateRow=which(USArea$State==State)
   if (identical(StateRow, integer(0))==T) {
-    AreaFmt="unk" 
-    Area=1
+    StateAreaFmt="unk" 
+    StateArea=1
   } else {
-    Area = USArea$landsqm[StateRow]
-    AreaFmt=formatC(Area, format="f", big.mark=",", digits=0)
+    StateArea = USArea$landsqm[StateRow]
+    StateAreaFmt=formatC(StateArea, format="f", big.mark=",", digits=0)
   }
-  PopuDens=Population/Area
-  PopuDensFmt=formatC(PopuDens, format="f", big.mark=",", digits=2)
+  PopulationDensity=StatePopulation/StateArea
+  PopulationDensityFmt=formatC(PopulationDensity, format="f", big.mark=",", digits=2)
   Total=sum(StateVals)
   TotalFmt=formatC(Total, format="f", big.mark=",", digits=0)
-  PerMillion=Total/Population*1000000
-  PerMillionFmt=formatC(PerMillion, format="f", big.mark=",", digits=2)
-  LastValPerMillion=LastVal/Population*1000000
-  title(sprintf("%s - COVID-19 DAILY %s (Total): %s on %s (%s)\nPop: %s; Area: %s sq-miles; Peak: %s on %s\nPopulation Density: %s; Total per Million: %s", State, toupper(DataType), LastValFmt, LastDate, TotalFmt, PopulationFmt, AreaFmt, MaxDayValFmt, MaxDate, PopuDensFmt, PerMillionFmt))
-  dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
-  dev.off()
-  #
-  # Update Accmulators [update outside of function]
-  #
-  
-  #cpd=c(cpd, PopuDens)       # Accumulated population densities
-  #ctt=c(ctt, Total)       # Accumulated total (deaths or cases)
-  #clt=c(clt, LastVal) # Accumulated last daily totals
-  #cltpm=c(cltpm, LastVal/Population*1000000)
-  #cpm=c(cpm, PerMillion)       # Accumulated per million (deaths or case)
-  #ca =c(ca, Area)      # Accumulated areas
-  #cp =c(cp, Population)      # Accumulated population
-  # NEED TO RETURN A LIST  
-  ret=list(pd=PopuDens, tt=Total, lastvalc=LastVal, lastvalcpm=LastValPerMillion, pm=PerMillion,area=Area, popu=Population)
+  OverallPerMillion=Total/StatePopulation*1000000
+  OverallPerMillionFmt=formatC(OverallPerMillion, format="f", big.mark=",", digits=2)
+  LastValPerMillion=LastVal/StatePopulation*1000000
+  title(sprintf("%s - COVID-19 DAILY %s (Total): %s on %s (%s)\nPop: %s; Area: %s sq-miles; Peak: %s on %s\nPopulation Density: %s; Total per Million: %s", State, toupper(DataType), LastValFmt, LastDate, TotalFmt, StatePopulationFmt, StateAreaFmt, MaxDayValFmt, MaxDate, PopulationDensityFmt, OverallPerMillionFmt))
+
+  ret=list(PopulationDensity=PopulationDensity, Total=Total, LastVal=LastVal, LastDate=LastDate, LastValPerMillion=LastValPerMillion, OverallPerMillion=OverallPerMillion,StateArea=StateArea, StatePopulation=StatePopulation)
   ret
 }
