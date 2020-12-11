@@ -1,7 +1,9 @@
 #
 # Add required libraries
 #
-if (require("RColorBrewer")==F) {  install.packages("RColorBrewer");  library(RColorBrewer) }
+if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
+if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
+if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
 #
 # Source required functions
 #
@@ -30,13 +32,6 @@ df  = cleanUSData  (dfOrig)
 dfd = createUSDiffs(df)
 
 States=dfd$State
-
-#NumCols=length(colnames(dfd))
-#TestState="New Mexico"
-#row=which(dfd$state==TestState) # Test
-#x=unlist(dfd[row,2:(NumCols-1)])
-#barplot(x)
-#title(TestState)
 
 #
 # Create a list of just the 50 states, excluding territories and cruise ships!
