@@ -3,13 +3,8 @@
 #
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
 if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
+detach("package:OpenCitizen", unload=T)
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
-#
-# Source required functions
-#
-source("cleanUSData.R")
-source("createUSDiffs.R")
-source("plotState.R")
 #
 # Choose a dataset to analyze & get filename
 #
@@ -44,7 +39,8 @@ FiftyStateRows=which( States!="Grand Princess"
                     & States!="Northern Mariana Islands"
                     & States!="Virgin Islands"
                     & States!="Puerto Rico")
-States50=States[FiftyStateRows]
+StatesFifty=States[FiftyStateRows]
+# There is also a dataframe in OpenCitizen called States50
 
 #
 # Set up accumulators for population density and total per million and totals
@@ -57,9 +53,9 @@ cLastValPerMillion=c() # Cumulative last daily death (or confirmed) per million
 cStateArea=c()    # Cumulative area
 cStatePopulation=c()    # Cumulative population
 #
-# Now plot a specific State
+# Now plot all states
 #
-for (State in States50) {
+for (State in StatesFifty) {
   RetVal = plotState(dfd, State, DataType)
   dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
   dev.off()
@@ -79,13 +75,13 @@ for (State in States50) {
 # Linear Model 
 #
 Population.Density=cPopuDens
-Deaths.Per.Million=cOverallPerMillion
+Overall.Per.Million=cOverallPerMillion
 Total.Area=cStateArea
 Total.DC=cTotal
 
-plot(Population.Density, Deaths.Per.Million, ylim=c(0,max(Deaths.Per.Million)+250)) 
-title("Covid-19, U.S. States: Population Density vs Deaths Per Million")
-model=lm(Deaths.Per.Million~Population.Density)
+plot(Population.Density, Overall.Per.Million, ylim=c(0,max(Overall.Per.Million)+250)) 
+title(sprintf("Covid-19, U.S. States: Population Density vs %s Per Million", toupper(DataType)))
+model=lm(Overall.Per.Million~Population.Density)
 summary(model)
 lines(Population.Density, predict(model))
 text(cPopuDens, cOverallPerMillion, st2, pos=3, cex=0.50)
