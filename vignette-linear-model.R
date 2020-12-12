@@ -19,25 +19,8 @@ FileName=Files[FilePatt]                        # Full filename
 #
 
 dfOrig=read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-dfPopu=read.csv(sprintf("%s/jhu-statepop.csv"     , Folder          )) # Population data
-dfArea=read.csv(sprintf("%s/census-state-area.csv", Folder          )) # Land area data
-
 df  = cleanUSData  (dfOrig)
 dfd = createUSDiffs(df)
-
-#
-# Create a list of just the 50 states, excluding territories and cruise ships!
-#
-States=dfd$State
-FiftyStateRows=which( States!="Grand Princess" 
-                    & States!="Diamond Princess" 
-                    & States!="District of Columbia"
-                    & States!="American Samoa"
-                    & States!="Guam"
-                    & States!="Northern Mariana Islands"
-                    & States!="Virgin Islands"
-                    & States!="Puerto Rico")
-StatesFifty=States[FiftyStateRows]
 
 #
 # Set up accumulators for population density and total per million and totals
@@ -52,7 +35,7 @@ cStatePopulation=c()    # Cumulative population
 #
 # Now plot all states
 #
-for (State in StatesFifty) {
+for (State in States50$State) {
   RetVal = summarizeState(dfd, State)
   #
   # Update Accmulators
