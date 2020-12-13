@@ -57,6 +57,8 @@ Overall.Per.Million=cOverallPerMillion
 Total.Area=cStateArea
 Total.DC=cTotal
 
+options(scipen=9, digits=4) # scipen>0 biases towards fixed notation, 4 digits
+
 plot(Population.Density, Overall.Per.Million, ylim=c(0,max(Overall.Per.Million)+250)) 
 title(sprintf("Covid-19, U.S. States: Population Density vs %s Per Million", toupper(DataType)))
 model=lm(Overall.Per.Million~Population.Density)

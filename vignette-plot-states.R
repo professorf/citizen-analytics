@@ -20,11 +20,12 @@ FileName=Files[FilePatt]                        # Full filename
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
 df     = cleanUSData  (dfOrig)
 dfd    = createUSDiffs(df)
+dft    = getRange(dfd, "2020-10-1","2020-12-7") 
 
 #
 # Create a list of just the 50 states, excluding territories and cruise ships!
 #
-States=dfd$State
+States=dft$State
 FiftyStateRows=which( States!="Grand Princess" 
                     & States!="Diamond Princess" 
                     & States!="District of Columbia"
@@ -40,7 +41,7 @@ StatesFifty=States[FiftyStateRows]
 # Now plot all states
 #
 for (State in StatesFifty) {
-  RetVal = plotState(dfd, State, DataType)
+  RetVal = plotState(dft, State, DataType)
   dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
   dev.off()
 }
