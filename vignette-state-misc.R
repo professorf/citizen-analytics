@@ -2,8 +2,8 @@
 # Add required libraries
 #
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
-if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
+if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 #
 # Choose a dataset to analyze & get filename
 #
