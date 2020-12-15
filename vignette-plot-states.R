@@ -8,7 +8,7 @@ if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); li
 #
 Folder   = "data"
 Files    = dir(Folder, "*.csv")
-DataType = "deaths"                             # Options: confirmed | deaths
+DataType = "confirmed"                          # Options: confirmed | deaths
 Region   = "US"                                 # USA (in world scripts, this is "global")
 FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
 FileName=Files[FilePatt]                        # Full filename
@@ -20,7 +20,7 @@ FileName=Files[FilePatt]                        # Full filename
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
 df     = cleanUSData  (dfOrig)
 dfd    = createUSDiffs(df)
-dft    = getRange(dfd, "2020-10-1","2020-12-7") 
+dft    = getRange(dfd, StartDate="2020-8-1") 
 
 #
 # Create a list of just the 50 states, excluding territories and cruise ships!
@@ -38,10 +38,20 @@ StatesFifty=States[FiftyStateRows]
 # There is also a dataframe in OpenCitizen called States50
 
 #
+# Do some annotations
+#
+# Annotation Dates
+AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1")
+# Annotation Labels
+AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day")
+# Create a dataframe of annotationis
+dfa    = data.frame(AnnotateDate, AnnotateLabel)
+
+#
 # Now plot all states
 #
 for (State in StatesFifty) {
-  RetVal = plotState(dft, State, DataType)
+  RetVal = plotState(dft, State, DataType, dfa)
   dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
   dev.off()
 }
