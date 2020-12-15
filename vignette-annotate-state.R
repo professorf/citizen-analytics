@@ -22,14 +22,11 @@ df     = cleanUSData  (dfOrig)
 dfd    = createUSDiffs(df)
 dft    = getRange(dfd, StartDate = "2020-8-1", EndDate = "") # Go to the last date 
 
-State = "New York" # Replace this with another state
+State = "New Mexico" # Replace this with another state
 # Annotation Dates
-AnnotateDate=c("2020-11-26", "2020-10-31", "2020-8-26")
-# Annotation Labels
-AnnotateLabel=c("Thanksgiving", "Halloween", "Colleges Start")
-# Create a dataframe of annotationis
+AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
+AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
 dfa    = data.frame(AnnotateDate, AnnotateLabel)
-
-RetVal = plotState(dft, State, DataType)
+RetVal = plotState(dft, State, DataType, dfa=dfa)
 dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
 dev.off()
