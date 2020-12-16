@@ -18,8 +18,8 @@ FileName=Files[FilePatt]                        # Full filename
 #
 
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanUSData  (dfOrig)
-dfd    = createUSDiffs(df)
+df     = cleanData  (dfOrig, Region)
+dfd    = createDaily(df)
 dft    = getRange(dfd, StartDate = "2020-3-1", EndDate = "") # Go to the last date 
 
 State = "New Mexico" # Replace this with another state
@@ -27,6 +27,6 @@ State = "New Mexico" # Replace this with another state
 AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
 AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
 dfa    = data.frame(AnnotateDate, AnnotateLabel)
-RetVal = plotState(dft, State, DataType, dfa=dfa)
+RetVal = plotState(dft, State, Region, DataType, dfa=dfa)
 dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
 dev.off()

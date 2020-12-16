@@ -19,7 +19,7 @@ FileName=Files[FilePatt]                        # Full filename
 
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
 df     = cleanData  (dfOrig, Region)
-dfd    = createUSDiffs(df)
+dfd    = createDaily(df)
 dft    = getRange(dfd, StartDate="2020-1-1", EndDate="2020-12-31") 
 
 #
@@ -51,7 +51,7 @@ dfa    = data.frame(AnnotateDate, AnnotateLabel)
 # Now plot all states
 #
 for (State in StatesFifty) {
-  RetVal = plotState(dft, State, DataType, dfa)
+  RetVal = plotState(dft, State, Region, DataType, dfa)
   dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
   dev.off()
 }

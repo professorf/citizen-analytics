@@ -24,11 +24,11 @@ FileName=Files[FilePatt]                        # Full filename
 #
 
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanGlobalData  (dfOrig)
-dfd    = createGlobalDiffs(df)
-dft    = getRange(dfd, StartDate="2020-3-1", EndDate="2020-12-31", DFType="Country") 
+df     = cleanData  (dfOrig, Region)
+dfd    = createDaily(df)
+dft    = getRange(dfd, StartDate="2020-3-1", EndDate="2020-12-31") 
 
-MultipleCountries=c("United Kingdom", "Germany", "Italy") # Input: List of countries
+MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: List of countries
 
 #
 # Do some annotations
@@ -40,4 +40,4 @@ AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "F
 # Create a dataframe of annotationis
 dfa    = data.frame(AnnotateDate, AnnotateLabel)
 
-plotCountry(dft, MultipleCountries, DataType, dfa)
+plotState(dft, MultipleCountries, Region, DataType, dfa)

@@ -18,11 +18,11 @@ FileName=Files[FilePatt]                        # Full filename
 #
 
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanUSData  (dfOrig)
-dfd    = createUSDiffs(df)
+df     = cleanData  (dfOrig, Region)
+dfd    = createDaily(df)
 dft    = getRange(dfd, StartDate = "2020-10-1", EndDate = "") # Go to the last date 
 
 State = "New Mexico" # Replace this with another state
-RetVal = plotState(dft, State, DataType)
+RetVal = plotState(dft, State, Region, DataType)
 dev.copy(png, sprintf("statepics/%s-%s.png",DataType,State), width=1280, height=720)
 dev.off()
