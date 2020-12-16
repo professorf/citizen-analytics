@@ -16,17 +16,17 @@ Folder   = "data"
 Files    = dir(Folder, "*.csv")
 DataType = "confirmed"                          # Options: confirmed | deaths
 Region   = "US"                                 # USA (in world scripts, this is "global")
-FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FilePatt]                        # Full filename
+FileIndex=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
+FileName=Files[FileIndex]                        # Full filename
 
 #
 # Read fileName into data frame & read other important data sets
 #
 
-dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanData  (dfOrig, Region)
-dfd    = createDaily(df)
-dft    = getRange(dfd, StartDate="2020-1-1", EndDate="2020-12-31") 
+dfOriginal = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
+dfClean     = cleanData  (dfOriginal, Region)
+dfDaily    = createDaily(dfClean)
+dfRange    = getRange(dfDaily, StartDate="2020-1-1", EndDate="2020-12-31") 
 
 # Extract the State Total Data & Calculate Daily Changes
 #cs=c("New York", "Texas", "Florida", "Arizona")            # Input: List of states
@@ -38,6 +38,6 @@ MultipleStates=c("New York", "Texas", "Florida", "California", "New Mexico") # I
 # Annotation Dates
 AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
 AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
-dfa    = data.frame(AnnotateDate, AnnotateLabel)
+dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
 
-plotState(dft, MultipleStates, Region, DataType, dfa)
+plotState(dfRange, MultipleStates, Region, DataType, dfAnnotation)

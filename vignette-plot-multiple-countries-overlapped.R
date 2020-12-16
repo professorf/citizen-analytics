@@ -16,17 +16,17 @@ Folder   = "data"
 Files    = dir(Folder, "*.csv")
 DataType = "confirmed"                          # Options: confirmed | deaths
 Region   = "global"                                 # USA (in world scripts, this is "global")
-FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FilePatt]                        # Full filename
+FileIndex=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
+FileName=Files[FileIndex]                        # Full filename
 
 #
 # Read fileName into data frame & read other important data sets
 #
 
-dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanData  (dfOrig, Region)
-dfd    = createDaily(df)
-dft    = getRange(dfd, StartDate="2020-3-1", EndDate="2020-12-31") 
+dfOriginal = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
+dfClean     = cleanData  (dfOriginal, Region)
+dfDaily    = createDaily(dfClean)
+dfRange    = getRange(dfDaily, StartDate="2020-3-1", EndDate="2020-12-31") 
 
 MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: List of countries
 
@@ -38,6 +38,6 @@ AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20",
 # Annotation Labels
 AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
 # Create a dataframe of annotationis
-dfa    = data.frame(AnnotateDate, AnnotateLabel)
+dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
 
-plotState(dft, MultipleCountries, Region, DataType, dfa)
+plotState(dfRange, MultipleCountries, Region, DataType, dfAnnotation)

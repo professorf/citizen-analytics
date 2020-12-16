@@ -4,24 +4,30 @@
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
 #
-# Get a data file 
+# Choose a dataset to analyze & get filename
 #
-folder="data"
-files=dir(folder, "*.csv")
-dtype="confirmed"                          # INPUT: confirmed | deaths | recovered
-percapita=F
-rtype="global"                             # INPUT: global | US
-filen=grep(sprintf("%s_%s", dtype, rtype), 
-           files, ignore.case=T)
-file=files[filen]
+Folder    = "data"                                   # Replace "data' if datasets in diff folder
+Files     = dir(Folder, "*.csv")                     # Grab all files in the folder
+DataType  = "confirmed"                              # Set data type: confirmed | deaths
+Region    = "global"                                 # Set region USA (vs "global")
+FileIndex = grep(sprintf("%s_%s", DataType, Region), # Create file pattern to look for 
+                               Files, ignore.case=T)
+FileName  = Files[FileIndex]                         # Get filename
 #
 # Read file into data frame
 #
-dfo=read.csv(sprintf("%s/%s",folder, file))
-dfc=cleanData(dfo, rtype)
-dfd=createDaily(dfc)
-dft=getRange(dfd, StartDate="2020-6-1", EndDate="2020-12-31")
-
-OneCountry="US"
-
-CountryInfo=plotState(dft, OneCountry, rtype, dtype)
+dfOriginal=read.csv(sprintf("%s/%s",Folder, FileName)) # Grab original JHU-CSSE dataset
+dfClean=cleanData(dfOriginal, Region)                  # Collapse all country county's into single row
+dfDaily=createDaily(dfClean)                           # Create daily values
+dfRange=getRange(dfDaily, StartDate="2020-1-1",        # Limit date range
+                          EndDate="2020-12-31")
+#
+# Set a country, then plot it
+#
+Country = "US" # Note: Countries are just nation states, replace this with other countries
+CountryInfo=plotState(dfRange, Country, Region, DataType)
+#
+# Save to a folder (pics)
+#
+dev.copy(png, sprintf("pics/%s-%s.png",DataType,State), width=1280, height=720)
+dev.off()
