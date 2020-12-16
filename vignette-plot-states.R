@@ -18,9 +18,9 @@ FileName=Files[FilePatt]                        # Full filename
 #
 
 dfOrig = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df     = cleanUSData  (dfOrig)
+df     = cleanData  (dfOrig, Region)
 dfd    = createUSDiffs(df)
-dft    = getRange(dfd, StartDate="2020-8-1") 
+dft    = getRange(dfd, StartDate="2020-1-1", EndDate="2020-12-31") 
 
 #
 # Create a list of just the 50 states, excluding territories and cruise ships!
@@ -41,9 +41,9 @@ StatesFifty=States[FiftyStateRows]
 # Do some annotations
 #
 # Annotation Dates
-AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1")
+AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
 # Annotation Labels
-AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day")
+AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
 # Create a dataframe of annotationis
 dfa    = data.frame(AnnotateDate, AnnotateLabel)
 
