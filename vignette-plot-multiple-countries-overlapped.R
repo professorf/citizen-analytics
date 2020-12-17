@@ -5,39 +5,40 @@ if (require("devtools")    ==F) { install.packages("devtools")              ; li
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen) }
 if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 #
+# Choose a dataset to analyze & get filename of that dataset
 #
-# PLOT MULTIPLE
+Folder    = "data"                                      # Set Folder where datasets stored
+Files     = dir(Folder, "*.csv")                        # Grab all files in that folder
+DataType  = "confirmed"                                 # Set type of dataset (confirmed|deaths)
+Region    = "global"                                    # Set region to global (vs US)
+FileIndex = grep(sprintf("%s_%s", DataType, Region),    # Get file index
+                 Files, ignore.case=T)
+FileName  = Files[FileIndex]                            # Get filename 
 #
+# Read file into data frame
 #
-#
-# Choose a dataset to analyze & get filename
-#
-Folder   = "data"
-Files    = dir(Folder, "*.csv")
-DataType = "confirmed"                          # Options: confirmed | deaths
-Region   = "global"                                 # USA (in world scripts, this is "global")
-FileIndex=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FileIndex]                        # Full filename
-
-#
-# Read fileName into data frame & read other important data sets
-#
-
-dfOriginal = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-dfClean     = cleanData  (dfOriginal, Region)
-dfDaily    = createDaily(dfClean)
-dfRange    = getRange(dfDaily, StartDate="2020-3-1", EndDate="2020-12-31") 
-
-MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: List of countries
-
+dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Get Original JHU-CSSE dataset
+dfClean    = cleanData  (dfOriginal, Region)              # Collapse country-counties into single row
+dfDaily    = createDaily(dfClean)                         # Calculate daily values
+dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit dates 
+                      EndDate="2020-12-31") 
 #
 # Do some annotations
 #
-# Annotation Dates
 AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
-# Annotation Labels
 AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
-# Create a dataframe of annotationis
 dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
-
+#
+# Create a vector of multiple countries
+#
+MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: List of countries
+#
+# Plot multiple countries overlapped
+#
 plotState(dfRange, MultipleCountries, Region, DataType, dfAnnotation)
+#
+# Write pic to folder (pics/multiple-countries.png)
+#
+dev.copy(png, sprintf("pics/multiple-countries.png",DataType,State), width=1280, height=720)
+dev.off()
+

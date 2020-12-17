@@ -5,39 +5,40 @@ if (require("devtools")    ==F) { install.packages("devtools")              ; li
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen) }
 if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 #
-#
-# PLOT MULTIPLE
-#
-#
-#
 # Choose a dataset to analyze & get filename
 #
-Folder   = "data"
-Files    = dir(Folder, "*.csv")
-DataType = "confirmed"                          # Options: confirmed | deaths
-Region   = "US"                                 # USA (in world scripts, this is "global")
-FileIndex=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FileIndex]                        # Full filename
+Folder    = "data"                                   # Replace "data' if datasets in diff folder
+Files     = dir(Folder, "*.csv")                     # Grab all files in that folder
+DataType  = "confirmed"                              # Set data type: confirmed | deaths
+Region    = "US"                                     # Set region USA (vs "global")
+FileIndex = grep(sprintf("%s_%s", DataType, Region), # Find file index based on pattern
+                 Files, ignore.case=T)
+FileName  = Files[FileIndex]                         # Get filename
 
 #
-# Read fileName into data frame & read other important data sets
+# Read file into data frame
 #
-
-dfOriginal = read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-dfClean     = cleanData  (dfOriginal, Region)
-dfDaily    = createDaily(dfClean)
-dfRange    = getRange(dfDaily, StartDate="2020-1-1", EndDate="2020-12-31") 
-
-# Extract the State Total Data & Calculate Daily Changes
-#cs=c("New York", "Texas", "Florida", "Arizona")            # Input: List of states
-MultipleStates=c("New York", "Texas", "Florida", "California", "New Mexico") # Input: List of states
-
+dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CSSE data
+dfClean    = cleanData  (dfOriginal, Region)              # Collapse states/counties into single row 
+dfDaily    = createDaily(dfClean)                         # Create daily values
+dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit date range
+                      EndDate="2020-12-31") 
 #
 # Do some annotations
 #
-# Annotation Dates
 AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
 AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
 dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
-
+#
+# Create a vector of multiple states
+#
+MultipleStates=c("New York", "Texas", "Florida", "California", "New Mexico")
+#
+# Plot state
+#
 plotState(dfRange, MultipleStates, Region, DataType, dfAnnotation)
+#
+# Save pic to folder (statepics/multiple-states.png)
+#
+dev.copy(png, sprintf("statepics/multiple-states.png",DataType,State), width=1280, height=720)
+dev.off()

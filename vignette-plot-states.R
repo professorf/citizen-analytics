@@ -18,9 +18,9 @@ FileName  = Files[FileIndex]                         # Get filename
 # Read file into data frame
 #
 dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CSSE data
-dfClean     = cleanData  (dfOriginal, Region)                  # Collapse states/counties into single row 
-dfDaily    = createDaily(dfClean)                              # Create daily values
-dfRange    = getRange(dfDaily, StartDate="2020-1-1",          # Limit date range
+dfClean     = cleanData  (dfOriginal, Region)             # Collapse states/counties into single row 
+dfDaily    = createDaily(dfClean)                         # Create daily values
+dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit date range
                        EndDate="2020-12-31") 
 
 #
