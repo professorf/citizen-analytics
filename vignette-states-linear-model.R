@@ -2,41 +2,41 @@
 # Add required libraries
 #
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
-if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
 #
 # Choose a dataset to analyze & get filename
 #
-DataType = "deaths"                             # Options: confirmed | deaths
-Region   = "US"                                 # USA (in world scripts, this is "global")
-Files    = dir(Folder, "*.csv")
-Folder   = "data"
-FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FilePatt]                        # Full filename
-
+Folder    = "data"                                   # Replace "data' if datasets in diff folder
+Files     = dir(Folder, "*.csv")                     # Grab all files in that folder
+DataType  = "deaths"                                 # Set data type: confirmed | deaths
+Region    = "US"                                     # Set region USA (vs "global")
+FileIndex = grep(sprintf("%s_%s", DataType, Region), # Find file index based on pattern
+                 Files, ignore.case=T)
+FileName  = Files[FileIndex]                         # Get filename
 #
-# Read fileName into data frame & read other important data sets
+# Read file into data frame
 #
-
-dfOrig=read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df  = cleanUSData  (dfOrig)
-dfd = createUSDiffs(df)
+dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CSSE data
+dfClean     = cleanData  (dfOriginal, Region)             # Collapse states/counties into single row 
+dfDaily    = createDaily(dfClean)                         # Create daily values
+dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit date range
+                      EndDate="2020-5-20") 
 
 #
 # Set up accumulators for population density and total per million and totals
 #
-cPopuDens=c()   # Cumulative population density
-cOverallPerMillion=c()   # Cumulative per million
-cTotal=c()   # Cumulative total deaths (or confirmed)
-cLastVal=c()   # Cumulative last daily death (or confirmed)
-cLastValPerMillion=c() # Cumulative last daily death (or confirmed) per million
-cStateArea=c()    # Cumulative area
-cStatePopulation=c()    # Cumulative population
+cPopuDens          = c()   # Cumulative population density
+cOverallPerMillion = c()   # Cumulative per million
+cTotal             = c()   # Cumulative total deaths (or confirmed)
+cLastVal           = c()   # Cumulative last daily death (or confirmed)
+cLastValPerMillion = c()   # Cumulative last daily death (or confirmed) per million
+cStateArea         = c()    # Cumulative area
+cStatePopulation   = c()    # Cumulative population
 #
 # Now plot all states
 #
 for (State in States50$State) {
-  RetVal = summarizeState(dfd, State)
+  RetVal = summarizeState(dfRange, State)
   #
   # Update Accmulators
   #
