@@ -35,10 +35,11 @@ MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: Lis
 #
 # Plot multiple countries overlapped
 #
-plotState(dfRange, MultipleCountries, Region, DataType, dfAnnotation)
+PerMillion=T
+plotState(dfRange, MultipleCountries, Region, DataType, dfAnnotation, PerMillion)
 #
 # Write pic to folder (pics/multiple-countries.png)
 #
-dev.copy(png, sprintf("pics/multiple-countries.png",DataType,State), width=1280, height=720)
+dev.copy(png, sprintf("pics/multiple-countries.png"), width=1280, height=720)
 dev.off()
 
