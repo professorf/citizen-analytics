@@ -3,24 +3,31 @@
 #
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
-if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; library(RColorBrewer)}
 #
 # Choose a dataset to analyze & get filename
 #
-DataType = "deaths"                             # Options: confirmed | deaths
-Region   = "US"                                 # USA (in world scripts, this is "global")
-Files    = dir(Folder, "*.csv")
-Folder   = "data"
-FilePatt=grep(sprintf("%s_%s", DataType, Region), Files, ignore.case=T)
-FileName=Files[FilePatt]                        # Full filename
+Folder    = "data"                                      # Set folder containings datasets
+Files     = dir(Folder, "*.csv")                        # Grab all files in that folder
+DataType  = "confirmed"                                 # Set type of dataset: confirmed | deaths
+Region    = "US"                                        # Set region: US (vs "global")
+FileIndex = grep(sprintf("%s_%s", DataType, Region),    # Get the index to the dataset 
+                 Files, ignore.case=T)
+FileName  = Files[FileIndex]                            # Get filename
 
 #
-# Read fileName into data frame & read other important data sets
+# Read fileName into data frame
 #
-
-dfOrig=read.csv(sprintf("%s/%s"                   , Folder, FileName)) # Original JHU data
-df  = cleanUSData  (dfOrig)
-dfd = createUSDiffs(df)
+dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Get original JHU-CSSE dataset
+dfClean    = cleanData  (dfOriginal, Region)              # Collapse state-counties into single row
+dfDaily    = createDaily(dfClean)                         # Create daily values
+dfRange    = getRange(dfDaily, StartDate = "2020-1-1",    # Limit data range
+                      EndDate = "2020-12-31")  
+#
+# Create annotations
+#
+AnnotateDate  = c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
+AnnotateLabel = c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
+dfAnnotation  = data.frame(AnnotateDate, AnnotateLabel)
 
 #
 # Set up accumulators for population density and total per million and totals
@@ -36,7 +43,7 @@ cStatePopulation=c()    # Cumulative population
 # Now plot all states
 #
 for (State in States50$State) {
-  RetVal = summarizeState(dfd, State)
+  RetVal = summarizeState(dfRange, State)
 
   # Update Accmulators
   cPopuDens=c(cPopuDens, RetVal$PopulationDensity)       # Accumulated population densities
@@ -82,3 +89,11 @@ Rdths=sum(cLastVal[Rrows])
 Ddths=sum(cLastVal[Drows])
 Tdths=sum(cLastVal)
 print(sprintf("R deaths: %d (%.2f)%%; D deaths: %d (%.2f)%%", Rdths, Rdths/Tdths*100, Ddths, Ddths/Tdths*100))
+#
+#
+#
+xoff=barplot(cTotal, names=States50$StateCode, ylim=c(0,max(cTotal)+5000), col=parcol, cex.names=0.75, border=parcol)
+text(xoff,cTotal,cTotal,cex=0.75,pos=3)
+title(sprintf("U.S.: Overall %s as of %s\nTotal on %s: %d", DataType, RetVal$LastDate, RetVal$LastDate, sum(cTotal)))
+
+pie(cTotal,labels=States50$StateCode)

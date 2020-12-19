@@ -8,7 +8,7 @@ if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); li
 #
 Folder    = "data"                                   # Replace "data' if datasets in diff folder
 Files     = dir(Folder, "*.csv")                     # Grab all files in the folder
-DataType  = "confirmed"                              # Set data type: confirmed | deaths
+DataType  = "deaths"                              # Set data type: confirmed | deaths
 Region    = "global"                                 # Set region USA (vs "global")
 FileIndex = grep(sprintf("%s_%s", DataType, Region), # Create file pattern to look for 
                                Files, ignore.case=T)

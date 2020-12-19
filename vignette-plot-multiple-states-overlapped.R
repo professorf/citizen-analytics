@@ -36,9 +36,10 @@ MultipleStates=c("New York", "Texas", "Florida", "California", "New Mexico")
 #
 # Plot state
 #
-plotState(dfRange, MultipleStates, Region, DataType, dfAnnotation)
+PerMillion=T
+plotState(dfRange, MultipleStates, Region, DataType, dfAnnotation, PerMillion)
 #
 # Save pic to folder (statepics/multiple-states.png)
 #
-dev.copy(png, sprintf("statepics/multiple-states.png",DataType,State), width=1280, height=720)
+dev.copy(png, sprintf("statepics/multiple-states.png"), width=1280, height=720)
 dev.off()

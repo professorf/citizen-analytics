@@ -19,8 +19,9 @@ FileName  = Files[FileIndex]                         # Get filename
 dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CSSE data
 dfClean     = cleanData  (dfOriginal, Region)             # Collapse states/counties into single row 
 dfDaily    = createDaily(dfClean)                         # Create daily values
-dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit date range
-                      EndDate="2020-5-20") 
+StartDate  = "2020-1-1"
+EndDate    = "2020-12-31"
+dfRange    = getRange(dfDaily, StartDate, EndDate)        # Limit date range
 
 #
 # Set up accumulators for population density and total per million and totals
@@ -60,13 +61,13 @@ Total.DC=cTotal
 options(scipen=9, digits=4) # scipen>0 biases towards fixed notation, 4 digits
 
 plot(Population.Density, Overall.Per.Million, ylim=c(0,max(Overall.Per.Million)+250)) 
-title(sprintf("Covid-19, U.S. States: Population Density vs %s Per Million", toupper(DataType)))
+title(sprintf("Covid-19, U.S. States: Population Density vs %s Per Million\n%s-%s", toupper(DataType), StartDate, EndDate))
 model=lm(Overall.Per.Million~Population.Density)
 summary(model)
 lines(Population.Density, predict(model))
 text(cPopuDens, cOverallPerMillion, OpenCitizen::States50$StateCode, pos=3, cex=0.50)
 dev.copy(png, sprintf("statepics/z-%s-linear-model.png",DataType), width=1280, height=720)
 dev.off()
-hist(residuals(model))
-dev.copy(png, sprintf("statepics/z-%s-residuals.png", DataType), width=1280, height=720)
-dev.off()
+#hist(residuals(model))
+#dev.copy(png, sprintf("statepics/z-%s-residuals.png", DataType), width=1280, height=720)
+#dev.off()

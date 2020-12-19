@@ -32,7 +32,8 @@ dfAnnotation  = data.frame(AnnotateDate, AnnotateLabel)
 # Set state and plot it
 #
 State = "New Mexico" # Replace this with another state
-RetVal = plotState(dfRange, State, Region, DataType, dfAnnotation)
+PerMillion=T
+RetVal = plotState(dfRange, State, Region, DataType, dfAnnotation, PerMil=PerMillion)
 #
 # Save plot to folder (statepics)
 #
