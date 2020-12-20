@@ -50,6 +50,9 @@ NVals = length(YVals)       # Number of values between first & last date inclusi
 DateN = names(YVals[NVals]) # Last Date
 plot(YVals, xaxt="n", ylab="# New Cases",xlab=sprintf("Days (0=%s, Last: %d=%s)",Date1,NVals-1,DateN)) # Actual curve from start to end
 
+# Plot the running 7-day average
+lines(7:length(StateInfo$StateVals), StateInfo$Avg7, col="lightgreen")
+
 # Add date labels to the axis, otherwise it's the index numbers
 DateLabels=names(YVals)
 axis(1, at=1:length(DateLabels), las=2, labels=DateLabels, cex.axis=0.5)
@@ -82,8 +85,8 @@ CurveModel   = nls(y~peak/10^((log(x/shift)/log(fat))^2)+lift, dfCurveToFit,
                start=list(peak=StateInfo$MaxDayVal, shift=iMaxDay,fat=2,lift=0), trace=T) 
 
 # Plot residuals to check quality of model
-Residuals=resid(CurveModel)
-hist(Residuals) # Want a normal distribution
+#Residuals=resid(CurveModel)
+#hist(Residuals) # Want a normal distribution
 
 #
 # Plot fitted curve (w/out prediction just as a check)
@@ -102,6 +105,8 @@ iPredictDate=dfCurveToFit$x[length(dfCurveToFit$x)]+DaysForward # INDEX of the p
 # Plot the original graph BUT with an EXPANDED xlim
 plot(YVals, ylim=c(0,StateInfo$MaxDayVal), xlim=c(0, iPredictDate), 
      ylab="# New Cases", xlab="", xaxt="n")
+# Plot the running 7-day average
+lines(7:length(StateInfo$StateVals), StateInfo$Avg7, col="lightgreen")
 
 # Create labels for the x-axis
 DateLabels=names(YVals)    # Start with existing labels
@@ -139,3 +144,19 @@ LastPredictedVal=round(PredictVals[length(PredictVals)])
 totaldeaths=round(sum(FittedVals)+sum(PredictVals[2:length(PredictVals)])) # 2 since PredictVals[1]-is FittedVals[N]
 lines(c(iPredictDate, iPredictDate), c(0,LastPredictedVal), col="red", lty=2)
 text(iPredictDate, LastPredictedVal, pos=2, col="red", sprintf("Predicted: %s\n%s", formatC(LastPredictedVal, big.mark=","), PredictDate))
+
+#
+# Finally, do any last minute annotations
+#
+AnnotateDate  = c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
+adDateLabels   = as.Date(DateLabels, format="%m/%d/%y")
+adAnnotateDate = as.Date(AnnotateDate)
+AnnotateLabel = c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
+XValList=sapply(adAnnotateDate, function (date) {which (adDateLabels==date)})
+for (i in 1:length(XValList)) {
+  XVal=XValList[[i]]
+  if (length(XVal)>0) {
+    lines(c(XVal, XVal), c(0,StateInfo$MaxDayVal), lty=2, col="lightgray")
+    text(XVal, StateInfo$MaxDayVal, pos=1, col="lightgray", sprintf("%s\n%s", AnnotateLabel[i], AnnotateDate[i]))
+  }
+}
