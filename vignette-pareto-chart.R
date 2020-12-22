@@ -42,6 +42,7 @@ dev.off()
 #
 # Pareto chart of major contributors to a range
 #
+par(mar = c(5, 4, 4, 4) + 0.3)  
 StateSums=rowSums(dfRange[2:length(dfRange)])
 StartDate=names(dfRange)[2]
 EndDate=names(dfRange)[length(dfRange)]
@@ -53,7 +54,8 @@ TotalSum=sum(StateSums)
 MaxY=max(SortedStateSums)
 XVals=barplot(SortedStateSums, las=2, cex.names=0.5, ylim=c(0,MaxY+.1*MaxY), 
               main=sprintf("Pareto Plot: %s (%s-%s)", "United States+Territories", 
-                           StartDate, EndDate))
+                           StartDate, EndDate),
+              xlab="STATES", ylab=toupper(DataType))
 text(XVals,SortedStateSums, pos=3, format(SortedStateSums, big.mark=","), cex=0.5)
 ParetoXVals=XVals
 ParetoYVals=c()
@@ -70,8 +72,10 @@ for (i in 1:length(SortedStateSums)) {
   }
   ParetoYVals=c(ParetoYVals, ScaledTotal)
 }
-lines(ParetoXVals, ParetoYVals)
-lines(c(ParetoXVals[1], ParetoXVals[length(ParetoXVals)]), c(Level80, Level80), lty=2)
-lines(c(ParetoXVals[iLevel80], ParetoXVals[iLevel80]), c(0, MaxY), lty=2)
+box()
+lines(ParetoXVals, ParetoYVals, type="l", xlab="", ylab="")
+lines(c(ParetoXVals[iLevel80], ParetoXVals[length(ParetoXVals)]), c(Level80, Level80), lty=2)
+lines(c(ParetoXVals[iLevel80], ParetoXVals[iLevel80]), c(0, Level80), lty=2)
+axis(side=4, at=Level80, line=0, las=2, label="80%", cex.axis=.5)
 #lines(XVals, SortedStateSums/TotalSum*MaxY)
 
