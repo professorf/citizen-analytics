@@ -20,28 +20,35 @@ FileName  = Files[FileIndex]                            # Get filename
 dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Get original JHU-CSSE dataset
 dfClean    = cleanData  (dfOriginal, Region)              # Collapse state-counties into single row
 dfDaily    = createDaily(dfClean)                         # Create daily values
-dfRange    = getRange(dfDaily, StartDate = "2020-1-1",    # Limit data range
-                               EndDate = "2020-5-23")  
+dfRange    = getRange(dfDaily, StartDate = "2020-3-1",    # Limit data range
+                               EndDate = "2020-3-31")  
+
+# Limit data frame to just the Fifty states
+States50Rows = which (dfRange$State %in% States50$State)
+dfStates50  = dfRange[States50Rows,]
 #
 # Pareto chart of major contributors to a range
 #
 
 # Reduce all states daily values to a single sum
-StateSums = rowSums(dfRange[2:length(dfRange)])
+StateSums = rowSums(dfStates50[2:length(dfStates50)])
 
 # Get starting and ending dates of range; format as m/d/y
-StartDate = names(dfRange)[2]
-EndDate   = names(dfRange)[length(dfRange)]
-StartDate = gsub("X", "", gsub("[.]", "/", StartDate))
-EndDate   = gsub("X", "", gsub("[.]", "/", EndDate))
-
+StartDate   = names(dfStates50)[2]
+EndDate     = names(dfStates50)[length(dfStates50)]
+StartDate   = gsub("X", "", gsub("[.]", "/", StartDate))
+EndDate     = gsub("X", "", gsub("[.]", "/", EndDate))
 # Do the Pareto bar plot of the sorted values, after setting various parameters
-names(StateSums) = dfRange$State                # StateSums lack labels, so add state labels
+names(StateSums) = States50$StateCode           # StateSums lack labels, so add state labels
 SortedStateSums  = sort(StateSums,decreasing=T) 
+StateColors = sapply(names(SortedStateSums), function (StateCode) {
+  Row = which (States50$StateCode==StateCode)
+  ifelse (States50$GovParty[Row]=="R", "pink", "lightblue")
+})
 TotalSum         = sum(StateSums)               # Save total of all states
 MaxY             = max(SortedStateSums)         # Save MaxY so we can plot properly
 XVals            = barplot(SortedStateSums, las=2, cex.axis=.5, cex.names=0.5, ylim=c(0,MaxY+.1*MaxY), 
-                           ylab=toupper(DataType), xlab="", col="lightblue")
+                           ylab=toupper(DataType), xlab="", col=StateColors, border=StateColors)
 
 # Add values on top of bars
 text(XVals,SortedStateSums, pos=3, format(SortedStateSums, big.mark=","), cex=0.5)
@@ -65,10 +72,10 @@ for (i in 1:length(SortedStateSums)) {
 
 # Now plot the Pareto curve
 box()
-title(sprintf("Pareto Plot: %s (%s-%s)\n%d States account for 80%% of the %s", 
-              "United States+Territories", StartDate, EndDate, iLevel80, DataType))
+title(sprintf("Pareto Plot: %s (%s-%s)\n%d States account for 80%% of the total %s (%s)", 
+              "United States+Territories", StartDate, EndDate, iLevel80, DataType, format(TotalSum, big.mark=",")))
 # Draw the curve
-lines(ParetoXVals, ParetoYVals, type="l", xlab="", ylab="", col="pink")
+lines(ParetoXVals, ParetoYVals, type="l", lty="dotted", xlab="", ylab="", col="gray")
 # Draw the horizontal 80% indicator line
 lines(c(ParetoXVals[iLevel80], ParetoXVals[length(ParetoXVals)]), c(Level80, Level80), lty=2, col="gray")
 # Draw the vertical 80% indicator line
