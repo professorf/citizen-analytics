@@ -20,8 +20,8 @@ FileName  = Files[FileIndex]                            # Get filename
 dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Get original JHU-CSSE dataset
 dfClean    = cleanData  (dfOriginal, Region)              # Collapse state-counties into single row
 dfDaily    = createDaily(dfClean)                         # Create daily values
-dfRange    = getRange(dfDaily, StartDate = "2020-3-1",    # Limit data range
-                               EndDate = "2020-3-31")  
+dfRange    = getRange(dfDaily, StartDate = "2020-12-1",    # Limit data range
+                               EndDate = "2020-12-31")  
 
 # Limit data frame to just the Fifty states
 States50Rows = which (dfRange$State %in% States50$State)
@@ -72,8 +72,8 @@ for (i in 1:length(SortedStateSums)) {
 
 # Now plot the Pareto curve
 box()
-title(sprintf("Pareto Plot: %s (%s-%s)\n%d States account for 80%% of the total %s (%s)", 
-              "United States+Territories", StartDate, EndDate, iLevel80, DataType, format(TotalSum, big.mark=",")))
+title(sprintf("COVID-19 Pareto Chart: %s (%s-%s)\n%d States account for 80%% of the total %s (%s)", 
+              "United States", StartDate, EndDate, iLevel80, ifelse (DataType=="confirmed", "cases", "deaths"), format(TotalSum, big.mark=",")))
 # Draw the curve
 lines(ParetoXVals, ParetoYVals, type="l", lty="dotted", xlab="", ylab="", col="gray")
 # Draw the horizontal 80% indicator line
@@ -83,4 +83,8 @@ lines(c(ParetoXVals[iLevel80], ParetoXVals[iLevel80]), c(0, Level80), lty=2, col
 # Add a label indicating 80%
 axis(side=4, at=Level80, line=0, las=2, label="80%", cex.axis=.5)
 # lines(XVals, SortedStateSums/TotalSum*MaxY) # The non-running total pareto
+
+# Credit JHU-CSSE dataset
+legend("topright", "Source: JHU CSSE Dataset", cex=0.50)
+
 

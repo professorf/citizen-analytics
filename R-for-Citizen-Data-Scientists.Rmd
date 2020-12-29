@@ -1,0 +1,25 @@
+---
+title: "R for Citizen Data Scientists"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+
+# Open a csv file into a data frame
+df=read.csv("HPQ.csv") # df is a VARIABLE, read.csv is a FUNCTION, "hp.csv" is a PARAMETER
+
+# Display
+df
+```
+```{r}
+plot(df$Open, type="o")
+text(1:length(df$Open))
+```
+```{r}
+plot(df$Close)
+```
+
