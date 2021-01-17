@@ -8,7 +8,7 @@ if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); li
 #
 Folder   = "data"                                     # Set folder containing datasets
 Files    = dir(Folder, "*.csv")                       # Grab all files in that folder
-DataType = "confirmed"                                # Set datatype: confirmed | deaths
+DataType = "deaths"                                # Set datatype: confirmed | deaths
 Region   = "global"                                   # Set region: US | global
 FileIndex=grep(sprintf("%s_%s", DataType, Region),    # Get index to file 
                                 Files, ignore.case=T)
@@ -24,8 +24,8 @@ dfRange    = getRange(dfDaily, StartDate = "2020-1-1",        # Limit data range
 #
 # Annotate Country
 #
-AnnotateDate  = c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
-AnnotateLabel = c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
+AnnotateDate  = c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22", "2020-12-21")
+AnnotateLabel = c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall", "Winter")
 dfAnnotation  = data.frame(AnnotateDate, AnnotateLabel)
 #
 # Set country and plot
@@ -35,5 +35,5 @@ RetVal = plotState(dfRange, Country, Region, DataType, dfAnnotation)
 #
 # Save country to folder (pics)
 #
-dev.copy(png, sprintf("pics/%s-%s.png",DataType,State), width=1280, height=720)
+dev.copy(png, sprintf("pics/%s-%s.png",DataType,Country), width=1280, height=720)
 dev.off()

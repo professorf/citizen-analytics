@@ -1,11 +1,29 @@
 ---
 title: "R for Citizen Data Scientists"
+author: Nick V. Flor
+date: December 31, 2020
 output: html_notebook
 ---
+**Nick V. Flor**<br>
+Mental Systems Research Lab<br>
+professorf@mentalsystemsinc.com<br>
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+Before we start, it's important to  know the difference between data and information. Data is basically anything you can perceive. But it's not information until you can use it—until it's useful. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+For example, a list of a stock's prices is simply data until you notice a trend that tells you to buy or sell; that trend in the stock prices is information.  In video games, a boss's movements are data until you notice a pattern that tells you how to dodge or strike; that "tell" is information.
+
+Simply put, data is potential information. And information is useful data. 
+
+Something needs to transform the data into information, and that something is a computer program.
+
+A computer program is a sequence of instructions that transforms data into information. A computer program can also store data, e.g., into a database, or forward the data, e.g., across a network. 
+
+But the prime directive, the sine qua non, the essential function of a computer program is to transform data into information.
+
+But where do you the computer program? The answer is: from a computer programmer. 
+
+Programming is the activity by computer programmers, which results in a sequence of instructions that a computer can use to transform data into information.
+
 
 ```{r}
 
@@ -18,8 +36,18 @@ df
 ```{r}
 plot(df$Open, type="o")
 text(1:length(df$Open))
+sum(df$Open)
 ```
 ```{r}
 plot(df$Close)
+```
+```{r}
+barplot(df$Close)
+```
+You can also read a file directly from a URL
+
+```{r}
+DataFrame=read.csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
+DataFrame
 ```
 

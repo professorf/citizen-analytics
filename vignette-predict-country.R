@@ -3,14 +3,17 @@
 #
 if (require("devtools")    ==F) { install.packages("devtools")              ; library(devtools)}
 if (require("OpenCitizen" )==F) { install_github  ("professorf/OpenCitizen"); library(OpenCitizen)}
-
+#
+# Optional flags
+#
+options(scipen=1000) # Bias towards not scientific notation
 #
 # Choose a dataset to analyze & get filename
 #
 Folder    = "data"                                      # Set folder containings datasets
 Files     = dir(Folder, "*.csv")                        # Grab all files in that folder
 DataType  = "confirmed"                                 # Set type of dataset: confirmed | deaths
-Region    = "US"                                        # Set region: US (vs "global")
+Region    = "global"                                    # Set region: US (vs "global")
 FileIndex = grep(sprintf("%s_%s", DataType, Region),    # Get the index to the dataset 
                  Files, ignore.case=T)
 FileName  = Files[FileIndex]                            # Get filename
@@ -33,7 +36,7 @@ dfAnnotation  = data.frame(AnnotateDate, AnnotateLabel)
 #
 # Set state and get info
 #
-State     = "New Mexico" # Replace this with another state
+State     = "US" # Replace this with another state
 StateInfo = summarizeState(dfRange, State, Region)
 
 ##########
@@ -63,12 +66,12 @@ title(sprintf("%s - COVID-19 New Cases (%s)\n%s-%s", State, DataType, names(Stat
 # Annotate peak date
 iMaxDay=which(names(YVals)==StateInfo$MaxDate)
 lines(c(iMaxDay, iMaxDay), c(0,StateInfo$MaxDayVal), lty=2)
-text(iMaxDay, StateInfo$MaxDayVal, pos=1, sprintf("Peak: %s\n%s", formatC(StateInfo$MaxDayVal, big.mark=","), StateInfo$MaxDate))
+text(iMaxDay, StateInfo$MaxDayVal, pos=1, sprintf("Peak: %s\n%s", format(StateInfo$MaxDayVal, scientific="F", big.mark=","), StateInfo$MaxDate))
 
 # Annotate last date
 iLastDay=which(names(YVals)==StateInfo$LastDate)
 lines(c(NVals  , NVals  ), c(0,StateInfo$LastVal  ), lty=2)
-text(iLastDay, StateInfo$LastVal, pos=2, sprintf("Last: %s\n%s", formatC(StateInfo$LastVal, big.mark=","), StateInfo$LastDate))
+text(iLastDay, StateInfo$LastVal, pos=2, sprintf("Last: %s\n%s", format(StateInfo$LastVal, scientific=F, big.mark=","), StateInfo$LastDate))
 
 #
 # Start of prediction code. Change the DaysForward variable as needed
@@ -124,10 +127,10 @@ lines(dfCurveToFit$x,FittedVals)
 
 # Annotate graph with Peak, Last, & Predicted values
 lines(c(iMaxDay,iMaxDay),c(0,StateInfo$MaxDayVal), col="lightblue" , lty=2)
-text(iMaxDay,StateInfo$MaxDayVal, pos=1, col="lightblue" , sprintf("Peak: %s\n%s", formatC(StateInfo$MaxDayVal, big.mark=","), StateInfo$MaxDate))
+text(iMaxDay,StateInfo$MaxDayVal, pos=1, col="lightblue" , sprintf("Peak: %s\n%s", format(StateInfo$MaxDayVal, scientific=F, big.mark=","), StateInfo$MaxDate))
 lines(c(NVals  , NVals  ), c(0,StateInfo$LastVal), col="gray", lty=2)
 iLastDay=which(names(YVals)==StateInfo$LastDate)
-text(iLastDay, StateInfo$LastVal, pos=4, col="gray", sprintf("Last: %s\n%s", formatC(StateInfo$LastVal, big.mark=","), StateInfo$LastDate))
+text(iLastDay, StateInfo$LastVal, pos=4, col="gray", sprintf("Last: %s\n%s", format(StateInfo$LastVal, scientific=F, big.mark=","), StateInfo$LastDate))
 
 # Predict from the last date to the predict date
 iPredictRange=(max(dfCurveToFit$x)):iPredictDate           # Need last point to draw properly         
@@ -143,7 +146,7 @@ title(sprintf("%s - COVID-19 New Cases (%s)\n%s-%s", State, DataType, names(Stat
 LastPredictedVal=round(PredictVals[length(PredictVals)])
 totaldeaths=round(sum(FittedVals)+sum(PredictVals[2:length(PredictVals)])) # 2 since PredictVals[1]-is FittedVals[N]
 lines(c(iPredictDate, iPredictDate), c(0,LastPredictedVal), col="red", lty=2)
-text(iPredictDate, LastPredictedVal, pos=2, col="red", sprintf("Predicted: %s\n%s", formatC(LastPredictedVal, big.mark=","), PredictDate))
+text(iPredictDate, LastPredictedVal, pos=2, col="red", sprintf("Predicted: %s\n%s", format(LastPredictedVal, big.mark=",", scientific=F), PredictDate))
 
 #
 # Finally, do any last minute annotations
@@ -160,3 +163,4 @@ for (i in 1:length(XValList)) {
     text(XVal, StateInfo$MaxDayVal, pos=1, col="lightgray", sprintf("%s\n%s", AnnotateLabel[i], AnnotateDate[i]))
   }
 }
+

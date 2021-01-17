@@ -23,7 +23,7 @@ dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CS
 dfClean     = cleanData  (dfOriginal, Region)                  # Collapse state-counties into a single row
 dfDaily    = createDaily(dfClean)                              # Create daily values
 dfRange    = getRange(dfDaily, StartDate = "2020-1-1",        # Limit data range 
-                      EndDate = "2020-12-31")  
+                      EndDate = "2021-12-31")  
 #
 # Annotate Country
 #
