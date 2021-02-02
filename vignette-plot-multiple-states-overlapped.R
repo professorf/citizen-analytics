@@ -22,12 +22,12 @@ dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Grab original JHU-CS
 dfClean    = cleanData  (dfOriginal, Region)              # Collapse states/counties into single row 
 dfDaily    = createDaily(dfClean)                         # Create daily values
 dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit date range
-                      EndDate="2020-12-31") 
+                      EndDate="2021-12-31") 
 #
 # Do some annotations
 #
-AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
-AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
+AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22", "2020-12-22", "2021-1-20")
+AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall", "Winter", "Biden")
 dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
 #
 # Create a vector of multiple states
