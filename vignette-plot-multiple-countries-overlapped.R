@@ -9,7 +9,7 @@ if (require("RColorBrewer")==F) { install.packages("RColorBrewer")          ; li
 #
 Folder    = "data"                                      # Set Folder where datasets stored
 Files     = dir(Folder, "*.csv")                        # Grab all files in that folder
-DataType  = "confirmed"                                 # Set type of dataset (confirmed|deaths)
+DataType  = "deaths"                                 # Set type of dataset (confirmed|deaths)
 Region    = "global"                                    # Set region to global (vs US)
 FileIndex = grep(sprintf("%s_%s", DataType, Region),    # Get file index
                  Files, ignore.case=T)
@@ -21,17 +21,17 @@ dfOriginal = read.csv(sprintf("%s/%s", Folder, FileName)) # Get Original JHU-CSS
 dfClean    = cleanData  (dfOriginal, Region)              # Collapse country-counties into single row
 dfDaily    = createDaily(dfClean)                         # Calculate daily values
 dfRange    = getRange(dfDaily, StartDate="2020-1-1",      # Limit dates 
-                      EndDate="2020-12-31") 
+                      EndDate="2021-12-31") 
 #
 # Do some annotations
 #
-AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22")
-AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall")
+AnnotateDate=c("2020-11-26", "2020-10-31", "2020-9-1", "2020-3-19", "2020-6-20", "2020-9-22", "2020-12-21", "2021-1-8")
+AnnotateLabel=c("Thanksgiving", "Halloween", "Labor Day", "Spring", "Summer", "Fall", "Winter", "Biden")
 dfAnnotation    = data.frame(AnnotateDate, AnnotateLabel)
 #
 # Create a vector of multiple countries
 #
-MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece") # Input: List of countries
+MultipleCountries=c("United Kingdom", "Germany", "Italy", "Greece", "Denmark") # Input: List of countries
 #
 # Plot multiple countries overlapped
 #
